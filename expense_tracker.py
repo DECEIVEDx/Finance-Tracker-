@@ -1,7 +1,9 @@
+
 import os
 from expenses import Expense
 import calendar
 import datetime
+from tabulate import tabulate
 
 def main():
     print(f"Running expense tracker!")
@@ -34,7 +36,7 @@ def get_user_expense():
         print("Select a category: ")
         for i, category_name in enumerate(expense_categories):
             print(f"{i +1}. {category_name}")
-            
+
         value_range = f"[1- {len(expense_categories)}]"
         try:
             selected_index = int(input(f"Enter category number {value_range}: ")) - 1
@@ -77,7 +79,8 @@ def summarise_expenses(expense_file_path, budget):
                 category=expense_category
             )
             expenses.append(line_expense)
-
+    table = [[e.name, f"${e.amount:.2f}", e.category] for e in expenses]
+    print(tabulate(table, headers=["Name", "Amount", "Category"], tablefmt="grid"))
     amount_by_category = {}
     for expense in expenses:
         key = expense.category
