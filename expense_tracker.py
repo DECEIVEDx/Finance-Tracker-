@@ -5,6 +5,7 @@ import calendar
 import datetime
 from tabulate import tabulate
 
+
 def main():
     print(f"Running expense tracker!")
     budget = float(input("Enter your budget: "))
@@ -80,7 +81,7 @@ def summarise_expenses(expense_file_path, budget):
             )
             expenses.append(line_expense)
     table = [[e.name, f"${e.amount:.2f}", e.category] for e in expenses]
-    print(tabulate(table, headers=["Name", "Amount", "Category"], tablefmt="grid"))
+    
     amount_by_category = {}
     for expense in expenses:
         key = expense.category
@@ -88,13 +89,39 @@ def summarise_expenses(expense_file_path, budget):
             amount_by_category[key] += expense.amount
         else:
             amount_by_category[key] = expense.amount
+    
+
+    show_table = input("Show summary table? (y/n): ").lower()
+    if show_table == "y":
+        print(tabulate(table, headers=["Name", "Amount", "Category"], tablefmt="grid"))
+    
+    show_graphs = input("Show graphs? (y/n): ").lower()
+    if show_graphs == "y" and amount_by_category:
+        # Bar chart
+        import matplotlib.pyplot as plt
+        categories = list(amount_by_category.keys())
+        amounts = list(amount_by_category.values())
+        plt.figure(figsize=(8, 5))
+        plt.bar(categories, amounts, color='skyblue')
+        plt.title('Expenses by Category')
+        plt.xlabel('Category')
+        plt.ylabel('Amount ($)')
+        plt.tight_layout()
+        plt.show()
+
+        # Pie chart
+        plt.figure(figsize=(6, 6))
+        plt.pie(amounts, labels=categories, autopct='%1.1f%%', startangle=140)
+        plt.title('Expense Distribution')
+        plt.tight_layout()
+        plt.show()
+
 
     print("Expenses by category:")
     for key, amount in amount_by_category.items():
         print(f"Total for {key}: ${amount:.2f}")
 
     total_spent = sum(expense.amount for expense in expenses)
-
     if total_spent > budget:
         print(f"Warning: You have exceeded your budget of ${budget:.2f} by ${total_spent - budget:.2f}")
     else:
